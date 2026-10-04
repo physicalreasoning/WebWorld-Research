@@ -1,11 +1,11 @@
+import os
 from openai import OpenAI
 import time
 import random
 import re
 
 MODEL_TO_API_BASE = {
-    "Qwen3-8B": "http://x.xx.xx.x:8012/v1",
-    "WebWorld-8B": "http://x.xx.xx.x:8012/v1",
+    "Qwen/WebWorld-8B": os.environ.get("MODAL_ENDPOINT_URL", "").rstrip("/") + "/v1",
 }
 
 def get_api_base_from_model(model_name):
@@ -26,7 +26,7 @@ def get_api_base_from_model(model_name):
         raise ValueError(f"Unable to resolve model name: {model_name}. Error: {str(e)}")
 
 
-def call_api(model, messages, temperature=0.1, max_retries=30, **kwargs):
+def call_api(model, messages, temperature=0.1, max_retries=60, **kwargs):
     """
     Call the API with support for dynamically setting the base_url.
     Automatically removes <reason> tag content from the response.
@@ -61,8 +61,11 @@ def call_api(model, messages, temperature=0.1, max_retries=30, **kwargs):
             return raw_response
             
         except Exception as e:
-            print(f"API error: {str(e)}, retrying...")
-            time.sleep(1)
+            error_str = str(e)
+            if "400" in error_str and "maximum context length" in error_str:
+                raise  # Don't retry context length errors
+            print(f"API error: {error_str}, retrying...")
+            time.sleep(5)
     raise Exception("Max retries reached")
 
 if __name__ == "__main__":

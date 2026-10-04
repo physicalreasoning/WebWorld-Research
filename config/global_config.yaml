@@ -1,8 +1,8 @@
 # global_config.yaml
 
 threading_config:
-  inference_workers: 32
-  evaluation_workers: 32
+  inference_workers: 16
+  evaluation_workers: 4
 
 
 selected_tasks:

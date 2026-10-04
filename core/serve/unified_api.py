@@ -11,22 +11,18 @@ sys.path.insert(0, str(project_root))
 
 # Try to import with standard production paths first
 try:
-    from core.serve.dashscope import call_api as dashscope_call
-    from core.serve.dlc import call_api as dlc_call
+    from core.serve.modal_client import call_api as modal_call
     from core.serve.huggingface import call_api as huggingface_call
-    from core.serve.oai import call_api as oai_call
+    from core.serve.anthropic_client import call_api as anthropic_call
     IMPORT_SUCCESS = True
 except ImportError:
     # If that fails, try direct imports (for when running from the script's directory)
     try:
-        import dashscope
-        import dlc
+        import modal_client
         import huggingface
-        import oai
-        from dashscope import call_api as dashscope_call
-        from dlc import call_api as dlc_call
+        from modal_client import call_api as modal_call
         from huggingface import call_api as huggingface_call
-        from oai import call_api as oai_call
+        from anthropic_client import call_api as anthropic_call
         IMPORT_SUCCESS = True
     except ImportError:
         # If all imports fail, set flag to False
@@ -37,7 +33,7 @@ def remove_reason_tags(text):
     """
     Remove <reason>...</reason> tags and their content from the text.
     If the tags do not exist, return the original text.
-    
+
     :param text: Original text
     :return: Processed text
     """
@@ -54,7 +50,7 @@ def unified_call(backend, model, prompt, parse_reason=True, **kwargs):
         backend (str): The backend to use.
         model (str): The model identifier.
         prompt (str): The input prompt.
-        parse_reason (bool): Whether to strip <reason>...</reason> tags 
+        parse_reason (bool): Whether to strip <reason>...</reason> tags
                              from the response. Defaults to True.
         **kwargs: Additional keyword arguments (e.g., temperature, max_tokens).
 
@@ -67,16 +63,12 @@ def unified_call(backend, model, prompt, parse_reason=True, **kwargs):
     ]
 
     # ---- Dispatch to the appropriate backend ----
-    if backend == 'dashscope':
-        raw_response = dashscope_call(model=model, messages=messages, **kwargs)
-    elif backend == 'dlc':
-        raw_response = dlc_call(model=model, messages=messages, **kwargs)
-    elif backend == 'oai':
-        raw_response = oai_call(model=model, messages=messages, **kwargs)
-    elif backend == 'openai':
-        raw_response = openai_call(model=model, messages=messages, **kwargs)
+    if backend == 'modal':
+        raw_response = modal_call(model=model, messages=messages, **kwargs)
     elif backend == 'huggingface':
         raw_response = huggingface_call(model=model, messages=messages, **kwargs)
+    elif backend == 'anthropic':
+        raw_response = anthropic_call(model=model, messages=messages, **kwargs)
     else:
         raise ValueError(f"Unsupported backend: {backend}")
 
@@ -88,11 +80,11 @@ def unified_call(backend, model, prompt, parse_reason=True, **kwargs):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Unified Model Calling Interface')
-    parser.add_argument('--backend', type=str, default='oai',
-                      choices=['dashscope', 'dlc', 'openai', 'oai', 'huggingface'],
-                      help='Select the backend service to use (default: oai)')
-    parser.add_argument('--model', type=str, default='gpt-4o-2024-11-20',
-                      help='Name of the model to use (default: gpt-4o-2024-11-20)')
+    parser.add_argument('--backend', type=str, default='modal',
+                      choices=['modal', 'huggingface', 'anthropic'],
+                      help='Select the backend service to use (default: modal)')
+    parser.add_argument('--model', type=str, default='Qwen/WebWorld-8B',
+                      help='Name of the model to use (default: Qwen/WebWorld-8B)')
     parser.add_argument('--prompt', type=str, default='Hello',
                       help='User input prompt (default: Hello)')
     parser.add_argument('--temperature', type=float, default=0.1,
@@ -105,8 +97,8 @@ if __name__ == '__main__':
     prompt = args.prompt
     try:
         response = unified_call(
-            backend="oai",
-            model="gpt-4o-2024-11-20",
+            backend=args.backend,
+            model=args.model,
             prompt=prompt,
             temperature=args.temperature,
             max_tokens=args.max_tokens

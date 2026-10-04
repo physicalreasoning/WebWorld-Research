@@ -16,7 +16,7 @@ class TaskRunner:
     def generate_prompt(self, **kwargs) -> str:
         return self.task.generate_prompt(**kwargs)
 
-    def call_api(self, prompt: str, eval_args: Dict) -> (str, float):
+    def call_api(self, prompt: str, eval_args: Dict):
         start = time.time()
         response = unified_call(
             backend=self.model_config.get('backend'),

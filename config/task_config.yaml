@@ -4,7 +4,7 @@ WEB_WORLD_MODEL_EVALUATION:
   base: ./data/web_wm/eval_data/base.jsonl
   fine_grained: ./data/web_wm/eval_data/fine_grained.jsonl
   multi_tab: ./data/web_wm/eval_data/multi_tab.jsonl
-  long: ./data/web_wm/eval_data/long.json
+  long: ./data/web_wm/eval_data/long_.json
   xml: ./data/web_wm/eval_data/xml.jsonl
   html: ./data/web_wm/eval_data/html.jsonl
   markdown: ./data/web_wm/eval_data/markdown.jsonl
@@ -17,9 +17,8 @@ WEB_WORLD_MODEL_EVALUATION:
   web_browser: ./data/web_wm/eval_envs/web_browser.jsonl
 
   evaluation_model:
-    backend: "openai"
-    model: "gpt-4o-2024-11-20"
+    backend: "anthropic"
+    model: "claude-sonnet-4-20250514"
     params:
       temperature: 0.7
       max_tokens: 8192
-      stream: True

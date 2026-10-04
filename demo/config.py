@@ -4,15 +4,15 @@ from dataclasses import dataclass
 
 @dataclass
 class AgentConfig:
-    backend: str = "dlc"
-    model: str = "Qwen3-8B"
+    backend: str = "modal"
+    model: str = "Qwen/WebWorld-8B"
     temperature: float = 0.5
     max_tokens: int = 2048
 
 @dataclass
 class WorldModelConfig:
-    backend: str = "dlc"           
-    model: str = "WebWorld-8B"
+    backend: str = "modal"
+    model: str = "Qwen/WebWorld-8B"
     temperature: float = 0.7
     max_tokens: int = 8196
 

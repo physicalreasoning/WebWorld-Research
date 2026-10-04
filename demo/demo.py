@@ -41,7 +41,7 @@ def print_banner(title: str, char: str = "=", width: int = 60):
 # 命令行参数
 # ══════════════════════════════════════════════════════════════
 
-BACKEND_CHOICES = ["dashscope", "dlc", "oai", "openai", "huggingface", "wm"]
+BACKEND_CHOICES = ["modal", "huggingface", "anthropic", "wm"]
 
 def parse_cli_args():
     d_a = _DEFAULT.agent
